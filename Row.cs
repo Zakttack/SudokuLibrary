@@ -27,14 +27,12 @@ namespace SudokuLibrary1
         private class RowEntryEnumerator : IEnumerator<Entry>
         {
             private readonly Entry[,] entries;
-            private ISet<int> values;
             private int columnIndex;
             private readonly int rowIndex;
 
             public RowEntryEnumerator(Entry[,] entries, int rowIndex)
             {
                 this.entries = entries;
-                values = new HashSet<int>();
                 columnIndex = 0;
                 this.rowIndex = rowIndex;
             }
@@ -43,10 +41,6 @@ namespace SudokuLibrary1
             {
                 get
                 {
-                    if (!values.Add(entries[rowIndex,columnIndex].Value))
-                    {
-                        throw new InvalidOperationException("Each row can't have duplicate numbers");
-                    }
                     return entries[rowIndex, columnIndex];
                 }
             }
@@ -66,7 +60,7 @@ namespace SudokuLibrary1
 
             public bool MoveNext()
             {
-                return columnIndex < entries.GetLength(1);
+                return columnIndex < entries.GetLength(1) && entries[rowIndex,columnIndex].Value > 0;
             }
 
             public void Reset()

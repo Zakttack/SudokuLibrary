@@ -4,15 +4,15 @@ namespace SudokuLibrary1
     public class Entry
     {
         
-        public Entry(int value)
+        public Entry()
         {
-            Value = value;
+            Value = 0;
         }
 
         public int Value
         {
             get;
-            private set;
+            set;
         }
     }
 }

@@ -29,7 +29,6 @@ namespace SudokuLibrary1
         {
             private Entry[,] sudokuGrid;
 
-            private ISet<int> values;
             private int columnIndex;
             private int rowIndex;
             public ColumnEntryEnumerator(Entry[,] sudokuGrid, int columnIndex)
@@ -37,17 +36,12 @@ namespace SudokuLibrary1
                 this.sudokuGrid = sudokuGrid;
                 this.columnIndex = columnIndex;
                 rowIndex = 0;
-                values = new HashSet<int>();
             }
 
             public Entry Current
             {
                 get
                 {
-                    if (!values.Add(sudokuGrid[rowIndex,columnIndex].Value))
-                    {
-                        throw new InvalidOperationException("No value can be repeated in a column.");
-                    }
                     return sudokuGrid[rowIndex,columnIndex];
                 }
             }
@@ -67,13 +61,12 @@ namespace SudokuLibrary1
 
             public bool MoveNext()
             {
-                return rowIndex < sudokuGrid.GetLength(0);
+                return rowIndex < sudokuGrid.GetLength(0) && sudokuGrid[rowIndex,columnIndex].Value > 0;
             }
 
             public void Reset()
             {
                 rowIndex = 0;
-                values.Clear();
             }
         }
     }
