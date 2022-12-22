@@ -32,6 +32,14 @@ namespace SudokuLibrary1
             }
         }
 
+        public IEnumerator<Row> Rows
+        {
+            get
+            {
+                return new RowEnumerator(this);
+            }
+        }
+
         private bool IsPefectSquare(int value)
         {
             string num = Math.Sqrt(value).ToString();
@@ -78,6 +86,49 @@ namespace SudokuLibrary1
             public void Reset()
             {
                 columnIndex = 0;
+            }
+        }
+
+        private class RowEnumerator : IEnumerator<Row>
+        {
+            private readonly Grid grid;
+            private int rowIndex;
+
+            public RowEnumerator(Grid grid)
+            {
+                this.grid = grid;
+                rowIndex = 0;
+            }
+
+            public Row Current
+            {
+                get
+                {
+                    return new Row(grid, rowIndex);
+                }
+            }
+
+            object IEnumerator.Current
+            {
+                get
+                {
+                    return Current;
+                }
+            }
+
+            public void Dispose()
+            {
+                rowIndex++;
+            }
+
+            public bool MoveNext()
+            {
+                return rowIndex < grid.SudokuGrid.GetLength(0);
+            }
+
+            public void Reset()
+            {
+                rowIndex = 0;
             }
         }
     }

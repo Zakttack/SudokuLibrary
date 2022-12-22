@@ -1,48 +1,78 @@
-﻿namespace SudokuLibrary1
+﻿using System.Collections;
+using System.Collections.Generic;
+namespace SudokuLibrary1
 {
-    public class Row
+    public class Row : IEnumerable<Entry>
     {
-        private readonly int[] values;
+        private Grid myGrid;
 
-        public Row()
+        private int rowIndex;
+
+        public Row(Grid grid, int rowIndex)
         {
-            values = new int[9];
+            myGrid = grid;
+            this.rowIndex = rowIndex;
         }
 
-        public int this[int index]
+        public IEnumerator<Entry> GetEnumerator()
         {
-            get
-            {
-                if (index < 0 || index >= values.Length)
-                {
-                    throw new ArgumentOutOfRangeException("location", "This location isn't part of the Sudoku Puzzle!!!");
-                }
-                return values[index];
-            }
-            set
-            {
-                if (index < 0 || index >= values.Length)
-                {
-                    throw new ArgumentOutOfRangeException("location", "This location isn't part of the Sudoku Puzzle!!!");
-                }
-                else if (Contains(value))
-                {
-                    throw new ArgumentException("The Number is already in the row!!!");
-                }
-                values[index] = value;
-            }
+            return new RowEntryEnumerator(myGrid.SudokuGrid, rowIndex);
         }
 
-        private bool Contains(int value)
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            foreach (int i in values)
+            return GetEnumerator();
+        }
+
+        private class RowEntryEnumerator : IEnumerator<Entry>
+        {
+            private readonly Entry[,] entries;
+            private ISet<int> values;
+            private int columnIndex;
+            private readonly int rowIndex;
+
+            public RowEntryEnumerator(Entry[,] entries, int rowIndex)
             {
-                if (i == value)
+                this.entries = entries;
+                values = new HashSet<int>();
+                columnIndex = 0;
+                this.rowIndex = rowIndex;
+            }
+
+            public Entry Current
+            {
+                get
                 {
-                    return true;
+                    if (!values.Add(entries[rowIndex,columnIndex].Value))
+                    {
+                        throw new InvalidOperationException("Each row can't have duplicate numbers");
+                    }
+                    return entries[rowIndex, columnIndex];
                 }
             }
-            return false;
+
+            object IEnumerator.Current
+            {
+                get
+                {
+                    return Current;
+                }
+            }
+
+            public void Dispose()
+            {
+                columnIndex++;
+            }
+
+            public bool MoveNext()
+            {
+                return columnIndex < entries.GetLength(1);
+            }
+
+            public void Reset()
+            {
+                columnIndex = 0;
+            }
         }
     }
 }
