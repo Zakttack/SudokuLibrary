@@ -1,54 +1,80 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SudokuLibrary1
 {
-    public class Column
+    public class Column : IEnumerable<Entry>
     {
-        private readonly int[] values;
+        private readonly Grid myGrid;
+        private readonly int columnIndex;
 
-        public Column()
+        public Column(Grid grid, int columnId)
         {
-            values = new int[9];
+            myGrid = grid;
+            columnIndex = columnId;
         }
 
-        public int this[int index]
+        public IEnumerator<Entry> GetEnumerator()
         {
-            get
-            {
-                if (index < 0 || index >= values.Length)
-                {
-                    throw new ArgumentOutOfRangeException("location", "This location isn't part of the Sudoku Puzzle!!!");
-                }
-                return values[index];
-            }
-            set
-            {
-                if (index < 0 || index >= values.Length)
-                {
-                    throw new ArgumentOutOfRangeException("location", "This location isn't part of the Sudoku Puzzle!!!");
-                }
-                else if (Contains(value))
-                {
-                    throw new ArgumentException("The Number is already in the column!!!");
-                }
-                values[index] = value;
-            }
+            return new ColumnEntryEnumerator(myGrid.SudokuGrid, columnIndex);
         }
 
-        private bool Contains(int value)
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            foreach (int i in values)
+            return GetEnumerator();
+        }
+
+        private class ColumnEntryEnumerator : IEnumerator<Entry>
+        {
+            private Entry[,] sudokuGrid;
+
+            private ISet<int> values;
+            private int columnIndex;
+            private int rowIndex;
+            public ColumnEntryEnumerator(Entry[,] sudokuGrid, int columnIndex)
             {
-                if (i == value)
+                this.sudokuGrid = sudokuGrid;
+                this.columnIndex = columnIndex;
+                rowIndex = 0;
+                values = new HashSet<int>();
+            }
+
+            public Entry Current
+            {
+                get
                 {
-                    return true;
+                    if (!values.Add(sudokuGrid[rowIndex,columnIndex].Value))
+                    {
+                        throw new InvalidOperationException("No value can be repeated in a column.");
+                    }
+                    return sudokuGrid[rowIndex,columnIndex];
                 }
             }
-            return false;
+
+            object IEnumerator.Current
+            {
+                get
+                {
+                    return Current;
+                }
+            }
+
+            public void Dispose()
+            {
+                rowIndex++;
+            }
+
+            public bool MoveNext()
+            {
+                return rowIndex < sudokuGrid.GetLength(0);
+            }
+
+            public void Reset()
+            {
+                rowIndex = 0;
+                values.Clear();
+            }
         }
     }
 }
