@@ -4,69 +4,25 @@ using System.Collections.Generic;
 
 namespace SudokuLibrary1
 {
-    public class Column : IEnumerable<Entry>
+    public class Column
     {
-        private readonly Grid myGrid;
-        private readonly int columnIndex;
+        private readonly ICollection<int> entries;
 
-        public Column(Grid grid, int columnId)
+        public Column(Grid entryGrid, int columnIndex)
         {
-            myGrid = grid;
-            columnIndex = columnId;
+            Service.ValidateColumnIndex(entryGrid, columnIndex);
+            entries = new List<int>();
+            for (int r = 0; r < entryGrid.Length; r++) 
+            {
+                entries.Add(entryGrid[r,columnIndex]);
+            }
         }
 
-        public IEnumerator<Entry> GetEnumerator()
+        public ICollection<int> Entries 
         {
-            return new ColumnEntryEnumerator(myGrid.SudokuGrid, columnIndex);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        private class ColumnEntryEnumerator : IEnumerator<Entry>
-        {
-            private Entry[,] sudokuGrid;
-
-            private int columnIndex;
-            private int rowIndex;
-            public ColumnEntryEnumerator(Entry[,] sudokuGrid, int columnIndex)
+            get
             {
-                this.sudokuGrid = sudokuGrid;
-                this.columnIndex = columnIndex;
-                rowIndex = 0;
-            }
-
-            public Entry Current
-            {
-                get
-                {
-                    return sudokuGrid[rowIndex,columnIndex];
-                }
-            }
-
-            object IEnumerator.Current
-            {
-                get
-                {
-                    return Current;
-                }
-            }
-
-            public void Dispose()
-            {
-                rowIndex++;
-            }
-
-            public bool MoveNext()
-            {
-                return rowIndex < sudokuGrid.GetLength(0) && sudokuGrid[rowIndex,columnIndex].Value > 0;
-            }
-
-            public void Reset()
-            {
-                rowIndex = 0;
+                return entries;
             }
         }
     }

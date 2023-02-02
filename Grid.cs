@@ -3,58 +3,99 @@ using System.Collections;
 using System.Collections.Generic;
 namespace SudokuLibrary1
 {
-    public class Grid
+    public class Grid : IEquatable<Grid>
     {
-        private readonly Entry[,] sudokuGrid;
+        private readonly int[,] sudokuGrid;
 
         public Grid(int n)
         {
-            if (!IsPefectSquare(n))
-            {
-                throw new ArgumentException("The sudoku puzzle must be a perfect square.");
-            }
-            sudokuGrid = new Entry[n,n];
+            sudokuGrid = new int[n,n];
             InitFill();
+
         }
 
-        public int SquareLength
+        public int Length
         {
             get
             {
-                return (int)Math.Sqrt(sudokuGrid.GetLength(0));
+                return sudokuGrid.GetLength(0);
             }
         }
 
-        public Entry[,] SudokuGrid
+        public int this[int rowIndex, int columnIndex]
         {
             get
             {
-                return sudokuGrid;
+                Service.ValidateColumnIndex(this, columnIndex);
+                Service.ValidateRowIndex(this, rowIndex);
+                return sudokuGrid[rowIndex, columnIndex];
+            }
+            set
+            {
+                Service.ValidateColumnIndex(this, columnIndex);
+                Service.ValidateRowIndex(this, rowIndex);
+                sudokuGrid[rowIndex, columnIndex] = value;
             }
         }
 
-        public IEnumerator<Column> Columns
+        public Grid Copy()
         {
-            get
+            Grid copy = new Grid(Length);
+            for (int r = 0; r < Length; r++) 
             {
-                return new ColumnEnumerator(this);
+                for (int c = 0; c < Length; c++)
+                {
+                    copy[r,c] = this[r, c];
+                }
             }
+            return copy;
+        }
+        public bool Equals(Grid other) 
+        {
+            if (Length != other.Length)
+            {
+                return false;
+            }
+            for (int r = 0; r < Length; r++) 
+            {
+                for (int c = 0; c < Length; c++) 
+                {
+                    if (this[r,c] != other[r,c])
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
 
-        public IEnumerator<Row> Rows
+        public override bool Equals(object obj)
         {
-            get
+            if (obj is not Grid)
             {
-                return new RowEnumerator(this);
+                return false;
             }
+            return Equals((Grid)obj);
         }
 
-        public IEnumerator<Square> Squares
+        public override int GetHashCode()
         {
-            get
-            {
-                return new SquareEnumerator(this);
-            }
+            return base.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+
+        public static bool operator== (Grid gridA, Grid gridB)
+        {
+            return gridA.Equals(gridB);
+        }
+
+        public static bool operator!= (Grid gridA, Grid gridB)
+        {
+            return !gridA.Equals(gridB);
         }
 
         private void InitFill()
@@ -63,169 +104,8 @@ namespace SudokuLibrary1
             {
                 for (int c = 0; c < sudokuGrid.GetLength(1); c++)
                 {
-                    sudokuGrid[r,c] = new Entry();
+                    sudokuGrid[r, c] = 0;
                 }
-            }
-        }
-
-        private bool IsPefectSquare(int value)
-        {
-            string num = Math.Sqrt(value).ToString();
-            int index = num.IndexOf('.');
-            if (index < 0)
-            {
-                return true;
-            }
-            for (int i = index + 1; i < num.Length; i++)
-            {
-                if (num[i] != '0')
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        private class ColumnEnumerator : IEnumerator<Column>
-        {
-            private readonly Grid grid;
-            private int columnIndex;
-
-            public ColumnEnumerator(Grid grid)
-            {
-                this.grid = grid;
-                columnIndex = 0;
-            }
-
-            public Column Current
-            {
-                get
-                {
-                    return new Column(grid, columnIndex);
-                }
-            }
-
-            object IEnumerator.Current
-            {
-                get
-                {
-                    return Current;
-                }
-            }
-
-            public void Dispose()
-            {
-                columnIndex++;
-            }
-
-            public bool MoveNext()
-            {
-                return columnIndex < grid.SudokuGrid.GetLength(1);
-            }
-
-            public void Reset()
-            {
-                columnIndex = 0;
-            }
-        }
-
-        private class RowEnumerator : IEnumerator<Row>
-        {
-            private readonly Grid grid;
-            private int rowIndex;
-
-            public RowEnumerator(Grid grid)
-            {
-                this.grid = grid;
-                rowIndex = 0;
-            }
-
-            public Row Current
-            {
-                get
-                {
-                    return new Row(grid, rowIndex);
-                }
-            }
-
-            object IEnumerator.Current
-            {
-                get
-                {
-                    return Current;
-                }
-            }
-
-            public void Dispose()
-            {
-                rowIndex++;
-            }
-
-            public bool MoveNext()
-            {
-                return rowIndex < grid.SudokuGrid.GetLength(0);
-            }
-
-            public void Reset()
-            {
-                rowIndex = 0;
-            }
-        }
-
-        private class SquareEnumerator : IEnumerator<Square>
-        {
-            private Grid myGrid;
-
-            private int columnIndex;
-
-            private int rowIndex;
-
-            public SquareEnumerator(Grid grid)
-            {
-                myGrid = grid;
-                columnIndex = 0;
-                rowIndex = 0;
-            }
-
-            public Square Current
-            {
-                get
-                {
-                    return new Square(myGrid, columnIndex, rowIndex);
-                }
-            }
-
-            object IEnumerator.Current
-            {
-                get
-                {
-                    return Current;
-                }
-            }
-
-            public void Dispose()
-            {
-                if (columnIndex < myGrid.SudokuGrid.GetLength(1))
-                {
-                    columnIndex += myGrid.SquareLength;
-                }
-                else
-                {
-                    columnIndex = 0;
-                    rowIndex += myGrid.SquareLength;
-                }
-            }
-
-            public bool MoveNext()
-            {
-                return columnIndex < myGrid.SudokuGrid.GetLength(1) &&
-                    rowIndex < myGrid.SudokuGrid.GetLength(0);
-            }
-
-            public void Reset()
-            {
-                columnIndex = 0;
-                rowIndex = 0;
             }
         }
     }

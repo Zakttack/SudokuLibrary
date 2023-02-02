@@ -2,70 +2,24 @@
 using System.Collections.Generic;
 namespace SudokuLibrary1
 {
-    public class Row : IEnumerable<Entry>
+    public class Row
     {
-        private Grid myGrid;
+        private readonly ICollection<int> entries;
 
-        private int rowIndex;
-
-        public Row(Grid grid, int rowIndex)
+        public Row(Grid entryGrid, int rowIndex) 
         {
-            myGrid = grid;
-            this.rowIndex = rowIndex;
+            Service.ValidateRowIndex(entryGrid, rowIndex);
+            entries = new List<int>();
+            for (int c = 0; c < entryGrid.Length; c++) 
+            {
+                entries.Add(entryGrid[rowIndex, c]);
+            }
         }
-
-        public IEnumerator<Entry> GetEnumerator()
+        public ICollection<int> Entries
         {
-            return new RowEntryEnumerator(myGrid.SudokuGrid, rowIndex);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        private class RowEntryEnumerator : IEnumerator<Entry>
-        {
-            private readonly Entry[,] entries;
-            private int columnIndex;
-            private readonly int rowIndex;
-
-            public RowEntryEnumerator(Entry[,] entries, int rowIndex)
+            get
             {
-                this.entries = entries;
-                columnIndex = 0;
-                this.rowIndex = rowIndex;
-            }
-
-            public Entry Current
-            {
-                get
-                {
-                    return entries[rowIndex, columnIndex];
-                }
-            }
-
-            object IEnumerator.Current
-            {
-                get
-                {
-                    return Current;
-                }
-            }
-
-            public void Dispose()
-            {
-                columnIndex++;
-            }
-
-            public bool MoveNext()
-            {
-                return columnIndex < entries.GetLength(1) && entries[rowIndex,columnIndex].Value > 0;
-            }
-
-            public void Reset()
-            {
-                columnIndex = 0;
+                return entries;
             }
         }
     }

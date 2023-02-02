@@ -7,87 +7,38 @@ using System.Threading.Tasks;
 
 namespace SudokuLibrary1
 {
-    public class Square : IEnumerable<Entry>
+    public class Square
     {
-        private readonly Grid myGrid;
-        private int columnIndex;
-        private int rowIndex;
+        private readonly ICollection<int> entries;
 
-        public Square(Grid grid, int columnStartIndex, int rowStartIndex)
+        public Square(Grid entryGrid, int columnIndex, int rowIndex) 
         {
-            myGrid = grid;
-            columnIndex = columnStartIndex;
-            rowIndex = columnStartIndex;
+            Service.ValidateColumnIndex(entryGrid, columnIndex);
+            Service.ValidateRowIndex(entryGrid, rowIndex);
+            entries = new List<int>();
+            BuildSubSquare(entryGrid, columnIndex, rowIndex);
         }
 
-        public IEnumerator<Entry> GetEnumerator()
+        private void BuildSubSquare(Grid entryGrid, int columnIndex, int rowIndex)
         {
-            return new SquareEntryEnumerator(myGrid.SudokuGrid, myGrid.SquareLength, columnIndex, rowIndex);
+            int squareLength = (int)Math.Sqrt(entryGrid.Length);
+            int columnStart = columnIndex - (columnIndex % squareLength);
+            int rowStart = rowIndex - (rowIndex % squareLength);
+
+            for (int r = rowStart; r < rowStart + squareLength; r++) 
+            {
+                for (int c = columnStart; c < columnStart + squareLength; c++)
+                {
+                    entries.Add(entryGrid[r,c]);
+                }
+            }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        public ICollection<int> Entries
         {
-            return GetEnumerator();
-        }
-
-        private class SquareEntryEnumerator : IEnumerator<Entry>
-        {
-            private readonly Entry[,] entries;
-            private readonly int squareLength;
-            private int columnIndex;
-            private int rowIndex;
-            private readonly int columnStartIndex;
-
-            private readonly int rowStartIndex;
-
-            public SquareEntryEnumerator(Entry[,] entries, int squareLength, int columnIndex, int rowIndex)
+            get
             {
-                this.entries = entries;
-                this.squareLength = squareLength;
-                columnStartIndex = columnIndex;
-                rowStartIndex = rowIndex;
-                Reset();
-            }
-
-            public Entry Current
-            {
-                get
-                {
-                    return entries[rowIndex,columnIndex];
-                }
-            }
-
-            object IEnumerator.Current
-            {
-                get
-                {
-                    return Current;
-                }
-            }
-
-            public void Dispose()
-            {
-                if (columnIndex < columnStartIndex + squareLength)
-                {
-                    columnIndex++;
-                }
-                else
-                {
-                    columnIndex = columnStartIndex;
-                    rowIndex++;
-                }
-            }
-
-            public bool MoveNext()
-            {
-                return columnIndex < columnStartIndex + squareLength && 
-                    rowIndex < rowStartIndex + squareLength && entries[rowIndex,columnIndex].Value > 0;
-            }
-
-            public void Reset()
-            {
-                columnIndex = columnStartIndex;
-                rowIndex = rowStartIndex;
+                return entries;
             }
         }
     }
