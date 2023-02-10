@@ -11,7 +11,11 @@ namespace SudokuLibrary1
         {
             sudokuGrid = new int[n,n];
             InitFill();
+        }
 
+        public Grid(int[,] sudokuGrid)
+        {
+            this.sudokuGrid = sudokuGrid;
         }
 
         public int Length

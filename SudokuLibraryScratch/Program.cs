@@ -1,2 +1,12 @@
-﻿Client client = new Client(9);
-Console.WriteLine(client.PotentialSolvedGrids.Count);
+﻿int[,] entryGrid = new int[,] {
+{6,4,2,9,5,0,0,0,1},
+{0,0,0,0,2,0,0,0,0},
+{3,0,1,0,4,0,8,0,0},
+{2,1,3,4,7,0,9,0,8},
+{7,0,0,0,9,0,2,0,3},
+{9,5,0,3,1,2,0,0,7},
+{0,0,0,0,3,0,0,0,9},
+{0,3,5,0,0,0,0,0,4},
+{0,0,0,5,0,0,0,3,0}};
+Client client = new Client(entryGrid);
+client.PrintGrid();
