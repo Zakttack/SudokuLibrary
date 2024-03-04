@@ -1,4 +1,3 @@
-using SudokuLibraryImplementation;
 namespace SudokuLibraryTester
 {
     public class ServiceTest

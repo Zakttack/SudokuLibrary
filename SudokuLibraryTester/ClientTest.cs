@@ -1,11 +1,4 @@
-﻿using SudokuLibraryImplementation;
-using SudokuLibraryImplementation.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿using SudokuLibraryImplementation.Models;
 namespace SudokuLibraryTester
 {
     public class ClientTest
