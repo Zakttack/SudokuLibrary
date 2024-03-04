@@ -1,93 +1,76 @@
-using System;
-using System.Collections.Generic;
-namespace SudokuLibrary1
+using SudokuLibraryImplementation.Models;
+using System.Collections;
+namespace SudokuLibraryImplementation
 {
-    public class Client
+    public class Client : IEnumerable<Grid>
     {
-        private readonly Grid current;
-        private readonly ICollection<Grid> grids;
-        public Client(int n) 
+        public Client(int n)
         {
             ValidateLength(n);
-            current = new Grid(n);
-            grids = new SortedSet<Grid>(new GridComparer());
-            FindPotential(current, 0, 0);
+            Length = n;
         }
 
-        public Client(int[,] entryGrid)
+        public int Length
         {
-            if (entryGrid == null) 
-            {
-                throw new ArgumentNullException("Entry Grid" ,"This grid doesn't exist.");
-            }
-            else if (entryGrid.GetLength(0) != entryGrid.GetLength(1)) 
-            {
-                throw new ArgumentException("The entry grid isn't square.");
-            }
-            int n = entryGrid.GetLength(0);
-            ValidateLength(n);
-            current = new Grid(entryGrid);
-            grids = new SortedSet<Grid>(new GridComparer());
-            FindPotential(current, 0, 0);
+            get;
         }
 
-        public void PrintGrid()
+        public IEnumerator<Grid> GetEnumerator()
         {
+            return new GridEnumerator(Length);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return new GridEnumerator(Length);
+        }
+
+        public Grid Solve(Grid current)
+        {
+            if (current is null)
+            {
+                throw new ArgumentNullException("Grid To Solve", "The Grid doesn't exist");
+            }
+            ValidateLength(current.Length);
+            ICollection<Grid> grids = new List<Grid>();
+            Stack<Grid> gridsStack = new();
+            gridsStack.Push(current);
+            while (gridsStack.TryPop(out Grid temp) && grids.Count < 3)
+            {
+                GridLocation loc = temp.EmptySlot;
+                if (loc is null)
+                {
+                    grids.Add(temp);
+                }
+                else
+                {
+                    for (int x = Length; x >= 1; x--)
+                    {
+                        if (Service.IsValidEntry(x, temp, loc.RowIndex, loc.ColumnIndex))
+                        {
+                            Grid other = temp.Copy();
+                            other[loc.RowIndex, loc.ColumnIndex] = x;
+                            gridsStack.Push(other);
+                        }
+                    }
+                }
+            }
             if (grids.Count != 1)
             {
-                throw new NotSupportedException("A partially filled sudoku must result in exactly one solvable grid.");
+                throw new InvalidOperationException("A grid must only have 1 solution.");
             }
-            IEnumerator<Grid> gridEnum = grids.GetEnumerator();
-            gridEnum.MoveNext();
-            Grid grid = gridEnum.Current;
-            for (int r = 0; r < grid.Length; r++)
-            {
-                string line = "";
-                for (int c = 0; c < grid.Length; c++)
-                {
-                    line += grid[r, c] + " ";
-                }
-                Console.WriteLine(line);
-            }
+            return grids.First();
         }
 
-        private void FindPotential(Grid current, int r, int c)
-        {
-            if (c >= current.Length)
-            {
-                FindPotential(current, r + 1, 0);
-            }
-            else if (r >= current.Length)
-            {
-                grids.Add(current.Copy());
-            }
-            else if (current[r,c] == 0)
-            {
-                for (int value = 1; value <= current.Length; value++)
-                {
-                    if (Service.IsValidEntry(value, current, r, c))
-                    {
-                        current[r, c] = value;
-                        FindPotential(current, r, c + 1);
-                    }
-                    current[r, c] = 0;
-                }
-            }
-            else
-            {
-                FindPotential(current, r, c + 1);
-            }
-        }
-
-        private void ValidateLength(int n)
+        private static void ValidateLength(int n)
         {
             if (n < 4)
             {
-                throw new ArgumentException("The sudoku puzzle must be at least 4x4.");
+                throw new ArgumentOutOfRangeException("Grid dimension","The sudoku puzzle must be at least 4x4.");
             }
             if (!Service.IsPefectSquare(n))
             {
-                throw new ArgumentException("The sudoku puzzle must be a perfect square.");
+                throw new ArgumentOutOfRangeException("Grid dimension","The sudoku puzzle must be a perfect square.");
             }
         }
     }

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-namespace SudokuLibrary1
+﻿namespace SudokuLibraryImplementation.Models
 {
     public class Row
     {

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SudokuLibraryImplementation", "..\SudokuLibrary\SudokuLibraryImplementation\SudokuLibrary1.csproj", "{CA0DA94D-B8FE-4E6B-8460-4626EB6D84EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SudokuLibraryImplementation", "..\SudokuLibrary\SudokuLibraryImplementation\SudokuLibraryImplementation.csproj", "{CA0DA94D-B8FE-4E6B-8460-4626EB6D84EC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuLibraryTester", "..\SudokuLibrary\SudokuLibraryTester\SudokuLibraryTester.csproj", "{F554443D-75DB-42F0-94AF-CD7F55E3D4EA}"
 EndProject

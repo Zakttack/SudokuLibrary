@@ -1,2 +1,2 @@
 global using NUnit.Framework;
-global using SudokuLibrary1;
+global using SudokuLibraryImplementation;

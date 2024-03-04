@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SudokuLibraryImplementation;
+using SudokuLibraryImplementation.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,8 +13,9 @@ namespace SudokuLibraryTester
         [Test]
         public void TestPotentialSolvedGrids()
         {
-            Client client = new Client(4);
-            Assert.That(client.PotentialSolvedGrids, Has.Count.EqualTo(288));
+            Client client = new(4);
+            IReadOnlyCollection<Grid> grids = client.ToList();
+            Assert.That(grids, Has.Count.EqualTo(288));
         }
     }
 }

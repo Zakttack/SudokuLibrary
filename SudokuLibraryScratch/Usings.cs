@@ -1,1 +1,1 @@
-﻿global using SudokuLibrary1;
+﻿global using SudokuLibraryImplementation;

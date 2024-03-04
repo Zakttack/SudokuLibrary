@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SudokuLibrary1
+﻿using SudokuLibraryImplementation.Models;
+namespace SudokuLibraryImplementation
 {
     public static class Service
     {
@@ -28,9 +23,9 @@ namespace SudokuLibrary1
 
         public static bool IsValidEntry(int value, Grid entryGrid, int rowIndex, int columnIndex)
         {
-            Column column = new Column(entryGrid, columnIndex);
-            Row row = new Row(entryGrid, rowIndex);
-            Square square = new Square(entryGrid, columnIndex, rowIndex);
+            Column column = new(entryGrid, columnIndex);
+            Row row = new(entryGrid, rowIndex);
+            Square square = new(entryGrid, columnIndex, rowIndex);
             return value == 0 || !(column.Entries.Contains(value) ||
                 row.Entries.Contains(value) || square.Entries.Contains(value));
         }

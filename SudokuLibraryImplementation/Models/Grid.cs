@@ -1,9 +1,6 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-namespace SudokuLibrary1
+namespace SudokuLibraryImplementation.Models
 {
-    public class Grid : IEquatable<Grid>
+    public class Grid : IComparable<Grid>, IEquatable<Grid>
     {
         private readonly int[,] sudokuGrid;
 
@@ -16,6 +13,25 @@ namespace SudokuLibrary1
         public Grid(int[,] sudokuGrid)
         {
             this.sudokuGrid = sudokuGrid;
+        }
+
+        public GridLocation EmptySlot
+        {
+            get
+            {
+                int r = 0;
+                int c = 0;
+                while (r < Length && this[r,c] != 0)
+                {
+                    int currentC = c;
+                    if (currentC == Length - 1)
+                    {
+                        r++;
+                    }
+                    c = (currentC + 1) % Length;
+                }
+                return r == Length ? null : new(r,c);
+            }
         }
 
         public int Length
@@ -42,9 +58,40 @@ namespace SudokuLibrary1
             }
         }
 
+        public int CompareTo(Grid other)
+        {
+            if (other is null)
+            {
+                return 1;
+            }
+            else if (Length < other.Length)
+            {
+                return -1;
+            }
+            else if (Length > other.Length)
+            {
+                return 1;
+            }
+            for (int r = 0; r < Length; r++)
+            {
+                for (int c = 0; c < Length; c++)
+                {
+                    if (this[r, c] < other[r, c])
+                    {
+                        return -1;
+                    }
+                    else if (this[r, c] > other[r, c])
+                    {
+                        return 1;
+                    }
+                }
+            }
+            return 0;
+        }
+
         public Grid Copy()
         {
-            Grid copy = new Grid(Length);
+            Grid copy = new(Length);
             for (int r = 0; r < Length; r++) 
             {
                 for (int c = 0; c < Length; c++)
@@ -56,21 +103,7 @@ namespace SudokuLibrary1
         }
         public bool Equals(Grid other) 
         {
-            if (Length != other.Length)
-            {
-                return false;
-            }
-            for (int r = 0; r < Length; r++) 
-            {
-                for (int c = 0; c < Length; c++) 
-                {
-                    if (this[r,c] != other[r,c])
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
+            return CompareTo(other) == 0;
         }
 
         public override bool Equals(object obj)
@@ -84,12 +117,12 @@ namespace SudokuLibrary1
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return HashCode.Combine(sudokuGrid);
         }
 
         public override string ToString()
         {
-            return base.ToString();
+            return sudokuGrid.ToString();
         }
 
         public static bool operator== (Grid gridA, Grid gridB)

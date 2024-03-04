@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SudokuLibraryImplementation\SudokuLibrary1.csproj" />
+    <ProjectReference Include="..\SudokuLibraryImplementation\SudokuLibraryImplementation.csproj" />
   </ItemGroup>
 
 </Project>
